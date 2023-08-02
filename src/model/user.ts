@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import baseModel from './base-model';
+import { md5 } from "../util/md5";
 
 const userSchema = new mongoose.Schema({
     ...baseModel,
@@ -14,6 +15,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+        set: (value: string) => md5(value),
+        select: false,
     },
     bio: {
         type: String,
