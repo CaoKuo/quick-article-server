@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import config from '../config/index'
 
 import userSchema from "./user";
+import articleSchema from "./article";
 
 mongoose.connect(config.dbUri, {
     useNewUrlParser: true,
@@ -14,6 +15,6 @@ mongoose.connect(config.dbUri, {
 });
 // 组织导出模型类
 const User = mongoose.model('User', userSchema);
-// const ArticleModel = mongoose.model('Article', ArticleSchema);
+const Article = mongoose.model('Article', articleSchema);
 
-export { User };
+export { User, Article };

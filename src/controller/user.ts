@@ -5,6 +5,7 @@ import { sign } from '../util/jwt'
 import { Secret } from 'jsonwebtoken'
 
 class Users {
+    // 登录
     async login(req: Request, res: Response, next: NextFunction) {
         try {
             const user = (req as any).user.toJSON();
@@ -15,17 +16,19 @@ class Users {
                     msg: 'user not find'
                 })
             }
-            
-            // const token = await sign(
-            //     { userId: user.user_id },
-            //     config.jwtSecret,
-            //     { expiresIn: '2d' }
-            // )
+
+            const jwtSecret: Secret = config.jwtSecret as Secret;
+
+            const token = await sign(
+                { userId: user._id },
+                jwtSecret as Secret,
+                { expiresIn: '1d' }
+            );
 
             delete user.password;
 
             // 将令牌写入 Cookie
-            // res.cookie('token', token, { httpOnly: true });
+            res.cookie('token', token, { httpOnly: true });
 
             /**
              * 后续可以从请求的 Cookie 中获取令牌
@@ -47,13 +50,17 @@ class Users {
              */
 
             return res.status(200).json({
-                ...user,
-                // token,
+                code: 0,
+                data: {
+                    ...user,
+                    token,
+                }
             })
         } catch (error) {
             next(error)
         }
     }
+    // 注册
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             let user = new User(req.body.user);
@@ -70,16 +77,56 @@ class Users {
             }
 
             res.status(201).json({
-                user: ret,
+                code: 0,
+                data: {
+                    user: ret,
+                }
             });
         } catch (error) {
             next(error)
         }
     }
+    // 获取当前用户信息
     async getCurrentUser(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.headers);
-            res.send('get /user')
+            res.status(200).json({
+                code: 0,
+                data: {
+                    user: (req as any).user
+                }
+            })
+        } catch (error) {
+            next(error);
+        }
+    }
+    // 更新用户信息
+    async updateCurrentUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userInfo = req.body.user;
+
+            const userId = (req as any).user._id;
+
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: userId },
+                userInfo,
+                { new: true }
+            )
+
+            if(!updatedUser) {
+                res.status(404).json({
+                    code: -1,
+                    msg: 'User not found'
+                })
+            }
+
+            console.log('Updated user:', updatedUser);
+
+            res.status(200).json({
+                code: 0,
+                data: {
+                    user: updatedUser,
+                }
+            })
         } catch (error) {
             next(error);
         }
