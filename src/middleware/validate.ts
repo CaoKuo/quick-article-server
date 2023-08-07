@@ -17,12 +17,12 @@ export const validate = (validations: ValidationChain[]) => {
 
         const customErrors = errors.array().map(error => {
             return {
-                code: -1,
                 msg: error.msg,
             };
         });
 
         res.status(400).json({
+            code: -1,
             errors: customErrors,
         });
     };

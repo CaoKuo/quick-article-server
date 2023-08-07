@@ -2,6 +2,7 @@ module.exports = {
     extends: ['@commitlint/config-conventional'],
     // 以下时我们自定义的规则
     rules: {
+        'type-empty': [0], // 允许空的 <type>
         'type-enum': [
             2,
             'always',
