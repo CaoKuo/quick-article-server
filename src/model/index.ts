@@ -8,9 +8,10 @@ import userFollowSchema from './userFollow';
 mongoose.connect(config.dbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-} as mongoose.ConnectOptions).then(() => {
-    console.log('Connected to MongoDB database!');
-})
+} as mongoose.ConnectOptions)
+    .then(() => {
+        console.log('Connected to MongoDB database!');
+    })
     .catch((err) => {
         console.error('Error connecting to MongoDB database:', err);
     });
