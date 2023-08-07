@@ -5,7 +5,10 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "nodemon --exec ts-node src/index.ts"
+		"lint-staged": "lint-staged",
+		"start": "nodemon --exec ts-node src/index.ts",
+		"prepare": "husky install",
+		"commitlint": "commitlint -E HUSKY_GIT_PARAMS"
 	},
 	"keywords": [],
 	"author": "",
@@ -16,18 +19,28 @@
 		"express": "^4.18.2",
 		"express-validator": "^7.0.1",
 		"jsonwebtoken": "^9.0.1",
+		"lint-staged": "^13.2.3",
 		"mongoose": "^7.4.1",
 		"morgan": "^1.10.0",
 		"nodemon": "^3.0.1",
-		"typescript": "^5.1.6"
+		"typescript": "*"
 	},
 	"devDependencies": {
+		"@commitlint/cli": "^17.6.7",
+		"@commitlint/config-conventional": "^17.6.7",
 		"@types/cookie-parser": "^1.4.3",
 		"@types/cors": "^2.8.13",
 		"@types/express": "^4.17.17",
 		"@types/jsonwebtoken": "^9.0.2",
 		"@types/morgan": "^1.9.4",
 		"@types/node": "^20.4.5",
+		"@typescript-eslint/eslint-plugin": "^5.52.0",
+		"eslint": "^8.0.1",
+		"eslint-config-standard-with-typescript": "^37.0.0",
+		"eslint-plugin-import": "^2.25.2",
+		"eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+		"eslint-plugin-promise": "^6.0.0",
+		"husky": "^8.0.0",
 		"ts-node": "^10.9.1"
 	}
 }

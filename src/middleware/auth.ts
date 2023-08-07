@@ -1,19 +1,22 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { sign, verify } from "../util/jwt";
-import config from "../config";
-import { User } from "../model";
+import { sign, verify } from '../util/jwt';
+import config from '../config';
+import { User } from '../model';
 
 const auth = async (req: Request, res: Response, next: NextFunction) => {
-    let token = req.cookies.token;
+    const token = req.cookies.token;
 
     if(!token) {
-        return res.status(401).end();
+        return res.status(401).json({
+            code: -1,
+            msg: '当前用户无权限',
+        });
     }
 
     try {
         const decodedToken: any = await verify(token, config.jwtSecret);
-        
+
         const currentTime = Date.now();
         const tokenExpiration = decodedToken.exp * 1000;
         const minimumValidity = 60 * 60 * 1000;
@@ -21,15 +24,18 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         const user = await User.findById(decodedToken.userId);
 
         if(!user) {
-            return res.status(401).end();
+            return res.status(401).json({
+                code: -1,
+                msg: '当前用户无权限',
+            });
         }
 
         if(tokenExpiration - currentTime < minimumValidity) {
             const newToken = await sign(
                 { userId: user._id },
                 config.jwtSecret,
-                { expiresIn: '1d' }
-            )
+                { expiresIn: '1d' },
+            );
 
             res.cookie('token', newToken, { httpOnly: true });
         }
@@ -37,8 +43,11 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         (req as any).user = user;
         next();
     } catch (error) {
-        return res.status(401).end();
+        return res.status(401).json({
+            code: -1,
+            msg: '当前用户无权限',
+        });
     }
-}
+};
 
 export default auth;

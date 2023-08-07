@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { validationResult, Result, ValidationError, buildCheckFunction, ValidationChain } from "express-validator";
+import { Request, Response, NextFunction } from 'express';
+import { validationResult, Result, ValidationError, buildCheckFunction, ValidationChain, Location } from 'express-validator';
+import { isValidObjectId as checkValidObjectId } from 'mongoose';
 
 export const validate = (validations: ValidationChain[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -19,11 +20,19 @@ export const validate = (validations: ValidationChain[]) => {
                 code: -1,
                 msg: error.msg,
             };
-        })
+        });
 
         res.status(400).json({
             errors: customErrors,
-        })
-    }
-}
+        });
+    };
+};
+
+export const isValidObjectId = (location: Location[], fields?: string | string[] | undefined) => {
+    return buildCheckFunction(location)(fields).custom(async value => {
+        if (!checkValidObjectId(value)) {
+            return Promise.reject(new Error('ID 不是一个有效的 objectID'));
+        }
+    });
+};
 

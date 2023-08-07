@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Set the HUSKY_GIT_PARAMS environment variable
+export HUSKY_GIT_PARAMS=$1
+
+# npm run commitlint --edit "$1"
+npm run commitlint
