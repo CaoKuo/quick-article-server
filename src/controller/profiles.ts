@@ -43,6 +43,7 @@ class Profiles {
             next(error);
         }
     }
+
     // 关注用户
     async followUser(req: Request, res: Response, next: NextFunction) {
         try {
@@ -105,6 +106,7 @@ class Profiles {
             next(error);
         }
     }
+
     // 取消关注
     async unFollowUser(req: Request, res: Response, next: NextFunction) {
         try {
@@ -158,6 +160,53 @@ class Profiles {
                     profile,
                 },
             });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // 获取关注的用户列表
+    async getProfilesUserList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const {
+                pageSize = 10,
+                pageNum = 1,
+                author,
+            } = req.query;
+
+            const skipCount =(Number(pageNum) - 1) * Number(pageSize);
+
+            const currentUserId = (req as any).user._id;
+
+            const followingUsers = await UserFollow.find({ follower: currentUserId });
+
+            const followingUserIds = followingUsers.map(follow => follow.following);
+
+            const userFilter: { [key: string]: any } = {
+                _id: {
+                    $in: followingUserIds,
+                },
+            };
+
+            if(author) {
+                userFilter.username = {
+                    $regex: new RegExp((author as string), 'i'),
+                };
+            }
+
+            const userList = await User.find(userFilter)
+                .skip(skipCount)
+                .limit(Number(pageSize));
+
+            console.log(userList);
+
+            res.status(200).json({
+                code: 0,
+                data: {
+                    list: userList,
+                },
+            });
+
         } catch (error) {
             next(error);
         }

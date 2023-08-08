@@ -12,7 +12,7 @@ router.use(UserRouter);
 router.use('/articles', ArticleRouter);
 
 // 关注相关
-router.use('/profiles/', ProfilesRouter);
+router.use('/profiles', ProfilesRouter);
 
 export default router;
 

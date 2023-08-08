@@ -5,6 +5,9 @@ import auth from '../middleware/auth';
 
 const router = express.Router();
 
+// 获取关注的用户列表
+router.get('/list', auth, Profiles.getProfilesUserList);
+
 // 获取用户信息
 router.get('/:userId', auth, ProfilesValidator.getProfilesUser, Profiles.getProfilesUser);
 
