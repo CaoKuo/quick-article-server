@@ -8,8 +8,8 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.token;
 
     if(!token) {
-        return res.status(401).json({
-            code: -1,
+        return res.status(200).json({
+            code: 401,
             msg: '当前用户无权限',
         });
     }
@@ -24,8 +24,8 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         const user = await User.findById(decodedToken.userId);
 
         if(!user) {
-            return res.status(401).json({
-                code: -1,
+            return res.status(200).json({
+                code: 401,
                 msg: '当前用户无权限',
             });
         }
@@ -43,8 +43,8 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         (req as any).user = user;
         next();
     } catch (error) {
-        return res.status(401).json({
-            code: -1,
+        return res.status(200).json({
+            code: 401,
             msg: '当前用户无权限',
         });
     }

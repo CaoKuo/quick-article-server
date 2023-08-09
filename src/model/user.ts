@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import baseModel from './base-model';
-import { md5 } from "../util/md5";
+import { md5 } from '../util/md5';
 
 const userSchema = new mongoose.Schema({
     ...baseModel,
@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
-})
+    role: {
+        type: Number,
+        default: 0,
+    },
+});
 
 export default userSchema;

@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { User } from "../model";
+import { User } from '../model';
 import config from '../config';
-import { sign } from '../util/jwt'
-import { Secret } from 'jsonwebtoken'
+import { sign } from '../util/jwt';
+import { Secret } from 'jsonwebtoken';
 
 class Users {
     // 登录
@@ -13,8 +13,8 @@ class Users {
             if(!user) {
                 return res.status(401).json({
                     code: -1,
-                    msg: 'user not find'
-                })
+                    msg: 'user not find',
+                });
             }
 
             const jwtSecret: Secret = config.jwtSecret as Secret;
@@ -22,7 +22,7 @@ class Users {
             const token = await sign(
                 { userId: user._id },
                 jwtSecret as Secret,
-                { expiresIn: '1d' }
+                { expiresIn: '1d' },
             );
 
             delete user.password;
@@ -54,36 +54,38 @@ class Users {
                 data: {
                     ...user,
                     token,
-                }
-            })
+                },
+            });
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     // 注册
     async register(req: Request, res: Response, next: NextFunction) {
         try {
-            let user = new User(req.body.user);
+            const user = new User(req.body.user);
+
+            user.role  = 0;
 
             await user.save();
 
             const { username, email, bio, image } = user;
             
-            let ret = {
+            const ret = {
                 username,
                 email,
                 bio,
-                image
-            }
+                image,
+            };
 
             res.status(201).json({
                 code: 0,
                 data: {
                     user: ret,
-                }
+                },
             });
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     // 获取当前用户信息
@@ -92,9 +94,9 @@ class Users {
             res.status(200).json({
                 code: 0,
                 data: {
-                    user: (req as any).user
-                }
-            })
+                    user: (req as any).user,
+                },
+            });
         } catch (error) {
             next(error);
         }
@@ -109,14 +111,14 @@ class Users {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: userId },
                 userInfo,
-                { new: true }
-            )
+                { new: true },
+            );
 
             if(!updatedUser) {
                 res.status(404).json({
                     code: -1,
-                    msg: 'User not found'
-                })
+                    msg: 'User not found',
+                });
             }
 
             console.log('Updated user:', updatedUser);
@@ -125,8 +127,8 @@ class Users {
                 code: 0,
                 data: {
                     user: updatedUser,
-                }
-            })
+                },
+            });
         } catch (error) {
             next(error);
         }
