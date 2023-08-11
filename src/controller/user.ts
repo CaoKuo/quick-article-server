@@ -65,7 +65,7 @@ class Users {
         try {
             const user = new User(req.body.user);
 
-            user.role  = 0;
+            user.role = 0;
 
             await user.save();
 
@@ -84,6 +84,58 @@ class Users {
                     user: ret,
                 },
             });
+        } catch (error) {
+            next(error);
+        }
+    }
+    // 获取所有的用户列表
+    async getUserList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const {
+                pageNum = 1,
+                pageSize = 10,
+                email,
+                username,
+                role,
+            } = req.query;
+
+            const skipCount = (Number(pageNum) - 1) * Number(pageSize);
+
+            const filter: { [key: string]: any } = {};
+            
+            if(email) {
+                filter.email = email;
+            }
+            console.log(role, typeof role);
+            if(role != ''  && role != undefined && role != null) {
+                filter.role = role;
+            }
+
+            if(username) {
+                filter.username = {
+                    $regex: new RegExp((username as string), 'i'),
+                };
+            }
+
+            console.log(filter);
+
+            const users = await User.find(filter)
+                .skip(skipCount)
+                .limit(Number(pageSize))
+                .sort({
+                    createdAt: -1,
+                });
+
+            const total = await User.countDocuments(filter);
+
+            res.status(200).json({
+                code: 0,
+                data: {
+                    users,
+                    total,
+                },
+            });
+
         } catch (error) {
             next(error);
         }
@@ -108,8 +160,19 @@ class Users {
 
             const userId = (req as any).user._id;
 
+            const userRole = (req as any).user.role;
+
+            const updateUserId = userInfo._id ? userInfo._id : '';
+
+            if(userId !== updateUserId && userRole != 2) {
+                return res.status(400).json({
+                    code: -1,
+                    msg: '用户无权限',
+                });
+            }
+
             const updatedUser = await User.findOneAndUpdate(
-                { _id: userId },
+                { _id: updateUserId },
                 userInfo,
                 { new: true },
             );
@@ -128,6 +191,21 @@ class Users {
                 data: {
                     user: updatedUser,
                 },
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+    // 删除用户信息
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.params.userId;
+
+            await User.findByIdAndDelete(userId);
+
+            res.status(200).json({
+                code: 0,
+                msg: '删除成功',
             });
         } catch (error) {
             next(error);

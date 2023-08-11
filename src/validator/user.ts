@@ -1,7 +1,9 @@
 import { body } from 'express-validator';
 import { validate } from '../middleware/validate';
+import { Request, Response, NextFunction } from 'express';
 import { User } from '../model';
 import { md5 } from '../util/md5';
+import { isValidObjectId } from '../middleware/validate';
 
 const login = [
     validate([
@@ -54,7 +56,52 @@ const register = validate([
     body('user.password').notEmpty().withMessage('密码不能为空'),
 ]);
 
+const getUserList = [
+    async (req: Request, res: Response, next: NextFunction) => {
+        const role = (req as any).user.role;
+        if(role <= 0) {
+            res.status(400).json({
+                code: -1,
+                msg: '当前用户无权限',
+            });
+        }
+        next();
+    },
+];
+
+const deleteUser = [
+    validate([
+        isValidObjectId(['params'], 'userId'),
+    ]),
+    async (req: Request, res: Response, next: NextFunction) => {
+        const userId = req.params.userId;
+
+        const user = User.findById(userId);
+
+        if(!user) {
+            return res.status(400).json({
+                code: -1,
+                msg: '用户不存在',
+            });
+        }
+
+        next();
+    },
+    async (req: Request, res: Response, next: NextFunction) => {
+        const role = (req as any).user.role;
+        if(role != 2) {
+            return res.status(200).json({
+                code: -1,
+                msg: '当前用户无权限',
+            });
+        }
+        next();
+    },
+];
+
 export default {
     login,
     register,
+    getUserList,
+    deleteUser,
 };
