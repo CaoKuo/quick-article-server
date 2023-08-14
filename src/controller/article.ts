@@ -12,8 +12,6 @@ class Articles {
                 author,
             } = req.query;
 
-            console.log('res===');
-
             const skipCount = (Number(pageNum) - 1) * Number(pageSize);
 
             const filter: { [key: string]: any } = {};

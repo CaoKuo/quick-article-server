@@ -4,6 +4,7 @@ import config from '../config/index';
 import userSchema from './user';
 import articleSchema from './article';
 import userFollowSchema from './userFollow';
+import tagsSchame from './tag';
 
 mongoose.connect(config.dbUri, {
     useNewUrlParser: true,
@@ -19,5 +20,6 @@ mongoose.connect(config.dbUri, {
 const User = mongoose.model('User', userSchema);
 const Article = mongoose.model('Article', articleSchema);
 const UserFollow = mongoose.model('UserFollow', userFollowSchema);
+const Tag = mongoose.model('Tag', tagsSchame);
 
-export { User, Article, UserFollow };
+export { User, Article, UserFollow, Tag };
